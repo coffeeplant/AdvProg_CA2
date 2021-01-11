@@ -30,6 +30,11 @@ public class BankAccount {
         this.amount = amount;
 
     }
+    
+    public BankAccount(int accountNumber) {
+        this.accountNumber = accountNumber;
+        accounts.add(this);
+     }
 
     public int getAccountNumber() {
         return accountNumber;
@@ -63,9 +68,9 @@ public class BankAccount {
         this.currentBalance = currentBalance;
     }
     
-    public void createAccount(){
-        accounts.add(1234);
-        new BankAccount();
+    public void createAccount(int accountNumber){
+        //accounts.add(1234);
+        new BankAccount(accountNumber);
         //should this happen here or in thread?
     }
 

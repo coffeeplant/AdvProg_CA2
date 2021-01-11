@@ -38,7 +38,7 @@ public class ServerMain {
                 Socket connSocket = serverSocket.accept();
                 System.out.println("New user connected");
             
-            // if File (false) create new BankAccount object
+
                 
             TransactionThread newAccountThread = new TransactionThread(connSocket, this);
             //transactions.add(newAccountThread);

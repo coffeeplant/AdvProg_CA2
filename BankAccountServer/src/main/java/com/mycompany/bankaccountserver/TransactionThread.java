@@ -35,6 +35,7 @@ public class TransactionThread extends Thread{
     private Integer accountNumber;
     private String transactionType;
     private Double amount;
+    String[] sp;
     
     BankAccount ba = new BankAccount();
     
@@ -51,43 +52,48 @@ public class TransactionThread extends Thread{
         //will need objectinout stream to take in file
         // if File (false) create new BankAccount object
 
-
         InputStream input = connSocket.getInputStream();
         BufferedReader serverInput = new BufferedReader(new InputStreamReader(input));
      
         OutputStream output = connSocket.getOutputStream();
         serverOutput = new PrintWriter(output, true);
         
-
-
+        //this works for now but may be way to pass over and user object instead
+        String clientRequest = serverInput.readLine();
+        sp = clientRequest.split("\\s");
+        accountNumber = Integer.parseInt(sp[0]);
+            System.out.println("accountNumer: " +accountNumber);
+        transactionType = (sp[1]);
+            System.out.println("transactionType: " +transactionType);
+        amount = Double.parseDouble(sp[0]);
+            System.out.println("amount: " +amount);
+        
+        String serverMessage = "New transaction request received";
  
-        String newTransaction = serverInput.readLine();
         //serverMain.addUserName(userName);
         
         //printUsers();
         
-        String serverMessage = "New transaction requested";
-        //sends a msg to all the users, excluing this current thread
-        //serverMain.broadcast(serverMessage, this);
-        
-        String clientRequest;
+
+            if(transactionType.equals("DEPOSIT")){
+                ba.deposit(amount);
+            }else{
+                ba.withdraw(amount);
+            }
         
 
+        serverOutput.println("accountNumber: " + ba.getAccountNumber());
+        serverOutput.println("Number of Deposits: " +ba.getNumOfDeposits());
+        serverOutput.println("Number of Withdrawals: " +ba.getNumOfWithdrawals());
+        serverOutput.println("Current Blance: " +ba.getCurrentBalance()+ "\n");
         
-        do{
-            clientRequest = serverInput.readLine();
-            serverMessage = clientRequest;
-            serverOutput.println(serverMessage);
-            ba.deposit(12);
-            ba.withdraw(12);
-            
-        }while(!clientRequest.equals("<exit room>"));
+
         
         //serverMain.removeUser(userName, this);
         connSocket.close();
         
         //serverMessage = userName + "has quitted.";
-        serverOutput.println(serverMessage);
+        //serverOutput.println(serverMessage);
 
         }catch (IOException e){
                         System.out.println("IO Exception");

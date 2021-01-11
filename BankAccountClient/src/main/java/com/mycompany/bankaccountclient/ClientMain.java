@@ -43,7 +43,7 @@ public class ClientMain {
                 Socket connSocket = new Socket(hostname, port);
                 System.out.println("Connected to the bank");
                 
-                //new FromBank(connSocket, this).start();
+                new TransactionThread(connSocket, this).start();
                 //new ToBank(connSocket, this).start();
                 
             }catch (UnknownHostException e){
@@ -71,17 +71,13 @@ public class ClientMain {
         String transactionType;
         Double amount;
 
-        BufferedReader serverInput;
-        DataOutputStream serverOutput;
-        Socket connSocket = null;
-        
     //input from customer
         Scanner scan = new Scanner(System.in);
-        System.out.print("Enter your account number: ");
+        System.out.println("Enter your account number: ");
         accountNumber = scan.nextInt();
-        System.out.print("Enter transaction type: ");
+        System.out.println("Enter transaction type: ");
         transactionType = scan.next();
-        System.out.print("Enter amount: ");
+        System.out.println("Enter amount: ");
         amount = scan.nextDouble();
               
  //        while (!input.hasNextDouble()) {
@@ -90,31 +86,7 @@ public class ClientMain {
     //creating connection to server
         ClientMain client = new ClientMain(hostname, port);
         client.execute();
-        
-        try{
-    //opening streams over socket
-            serverInput = new BufferedReader(new InputStreamReader(connSocket.getInputStream()));
-            serverOutput = new DataOutputStream(connSocket.getOutputStream());
-            System.out.println("Connection established");
-            String transactionRequest = (accountNumber + " " +transactionType + " " +amount);
-            serverOutput.writeBytes(transactionRequest);
-            System.out.println("Waiting for reply");
-            while(true){
-                try{
-                    String response = serverInput.readLine();
-                    System.out.println("\n" + response);
-                    break;
-                }catch(IOException e){
-                    System.out.println("Error with input from server" + e.getMessage());
 
-                }
-            }
-            serverOutput.close();
-            serverInput.close();
-            connSocket.close();
-        }catch(IOException e){
-            System.out.println(e.getMessage());
-        }
     }//end of main
 
 
