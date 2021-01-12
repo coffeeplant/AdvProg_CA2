@@ -152,29 +152,20 @@ public class BankAccount implements Serializable, Account{
         return currentBalance;
     }
     
-    public synchronized double withdraw(int accountNumber, double amount){
+    public synchronized String withdraw(int accountNumber, double amount){
         if(sm.getAccount(accountNumber)== false){
-            System.out.println("No such account exists");
+            return "No such account exists";
         }else if (sm.getAccount(accountNumber) && amount>currentBalance){
-            System.out.println("Insufficient funds");
-            try{
-                wait();
-            }catch(Exception e){
-                System.out.println("Interruption occured");
-            }
-            this.currentBalance = currentBalance - amount;
-            this.numOfWithdrawals++;
+            return "Insufficient funds";  
         }
         else{
             this.currentBalance = currentBalance - amount;
             this.numOfWithdrawals++;
+            checkTransactionLimit();
+            
+            String balance = Double.toString(this.currentBalance);
+            return balance;
         }
-//        //check balance sufficent, if not no change to balance, generate error
-//        //decreses balance by amount
-//        
-        checkTransactionLimit();
-
-        return currentBalance;
     }
     
     //**************METHODS RLEATED TO OBSERVER DESIGN PATTERN****************

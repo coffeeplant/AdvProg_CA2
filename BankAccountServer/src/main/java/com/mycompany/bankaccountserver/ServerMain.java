@@ -90,9 +90,12 @@ public class ServerMain {
     boolean getAccount(int acNum){
         System.out.println("Inside getAccount method");
         if(accounts.containsKey(acNum)){
+            System.out.println("it's true");
             return true;
         }else{
+            System.out.println("Its false");
             return false;
+            
         }
     }
     

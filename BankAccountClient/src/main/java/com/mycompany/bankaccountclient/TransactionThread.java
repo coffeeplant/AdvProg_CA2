@@ -51,19 +51,20 @@ public class TransactionThread extends Thread{
             System.out.println("Waiting for reply");
             
             //while(true) not working here, need to find more sustainable way of reciving on a loop
-            for (int i = 0; i <4; i++) {
+           
+            for (int i = 0; i <= 4; i++) {
                 try{
                         String response = serverInput.readLine();
-                        System.out.println("\n" + response);
-                        
+                            if (response == null){
+                            break;
+                        }
+                        System.out.println("\n" + response); 
+
                     }catch(IOException e){
                         System.out.println("Error with input from server" + e.getMessage());
                         break;
                     }
                 }
-            
-            
-
             serverOutput.close();
             serverInput.close();
             connSocket.close();

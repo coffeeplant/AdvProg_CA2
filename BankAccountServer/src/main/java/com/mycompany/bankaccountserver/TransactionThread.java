@@ -108,20 +108,34 @@ public class TransactionThread extends Thread{
 //PASSING TO DEPOSIT/WITHDRAW
                 if(transactionType.equalsIgnoreCase("DEPOSIT")){
                     ba.deposit(accountNumber, amount);
+                    serverOutput.println("accountNumber: " + ba.getAccountNumber());
+                    serverOutput.println("Number of Deposits: " +ba.getNumOfDeposits());
+                    System.out.println("Number of Deposits: " +ba.getNumOfDeposits());
+                    serverOutput.println("Number of Withdrawals: " +ba.getNumOfWithdrawals());
+                    System.out.println("Number of Withdrawals: " +ba.getNumOfWithdrawals());
+                    serverOutput.println("Current Balance: " +ba.getCurrentBalance()+ "\n");
+                    System.out.println("Current Balance: " +ba.getCurrentBalance()+ "\n");
                 }else if (transactionType.equalsIgnoreCase("WITHDRAW")){
-                    ba.withdraw(accountNumber, amount);
-                }
-//SENDING RESPONSE TO CUSTOMER
-            serverOutput.println("accountNumber: " + ba.getAccountNumber());
-                System.out.println("Sent TEST: accountNumber:" + ba.getAccountNumber());
-            serverOutput.println("Number of Deposits: " +ba.getNumOfDeposits());
-                System.out.println("Number of Deposits: " +ba.getNumOfDeposits());
-            serverOutput.println("Number of Withdrawals: " +ba.getNumOfWithdrawals());
-                System.out.println("Number of Withdrawals: " +ba.getNumOfWithdrawals());
-            serverOutput.println("Current Blance: " +ba.getCurrentBalance()+ "\n");
-                System.out.println("Current Blance: " +ba.getCurrentBalance()+ "\n");
+                    String withdrawString = ba.withdraw(1, 10);
+                        try{
+                            double test = Double.parseDouble(withdrawString);
+                            serverOutput.println("accountNumber: " + ba.getAccountNumber());
+                            System.out.println("Sent TEST: accountNumber:" + ba.getAccountNumber());
+                            serverOutput.println("Number of Deposits: " +ba.getNumOfDeposits());
+                            System.out.println("Number of Deposits: " +ba.getNumOfDeposits());
+                            serverOutput.println("Number of Withdrawals: " +ba.getNumOfWithdrawals());
+                            System.out.println("Number of Withdrawals: " +ba.getNumOfWithdrawals());
+                            serverOutput.println("Current Balance: " +ba.getCurrentBalance()+ "\n");
+                            System.out.println("Current Balance: " +ba.getCurrentBalance()+ "\n");
+                        }catch( NumberFormatException e){
+                            serverOutput.println(withdrawString +"\n");
+                            
+                        }
+                } 
 
             //serverMain.removeUser(userName, this);
+            clientInput.close();
+            serverOutput.close();
             connSocket.close();
 
             //serverMessage = userName + "has quitted.";
