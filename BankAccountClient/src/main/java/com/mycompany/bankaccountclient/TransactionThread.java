@@ -24,9 +24,12 @@ public class TransactionThread extends Thread{
     DataOutputStream serverOutput;
 
 
-    public TransactionThread(Socket connSocket, ClientMain main) {
+    public TransactionThread(Socket connSocket, ClientMain main, int accountNum, String type, double am) {
         this.connSocket = connSocket;
         this.clientMain = main;
+        this.accountNumber = accountNum;
+        this.transactionType = type;
+        this.amount = am;
 
         try{
             serverInput = new BufferedReader(new InputStreamReader(connSocket.getInputStream()));
@@ -42,20 +45,27 @@ public class TransactionThread extends Thread{
             
         try{
             System.out.println("Connection established");
-            String transactionRequest = (accountNumber + "," +transactionType + "," +amount);
+            String transactionRequest = (accountNumber + "," +transactionType + "," +amount + "\n");
+            System.out.println(transactionRequest);
             serverOutput.writeBytes(transactionRequest);
             System.out.println("Waiting for reply");
-                while(true){
-                    try{
+            
+            //while(true) not working here, need to find more sustainable way of reciving on a loop
+            for (int i = 0; i <4; i++) {
+                try{
                         String response = serverInput.readLine();
                         System.out.println("\n" + response);
-                        break;
+                        
                     }catch(IOException e){
                         System.out.println("Error with input from server" + e.getMessage());
+                        break;
                     }
-                serverOutput.close();
                 }
+            
+            
 
+            serverOutput.close();
+            serverInput.close();
             connSocket.close();
         }catch(IOException e){
             System.out.println(e.getMessage());

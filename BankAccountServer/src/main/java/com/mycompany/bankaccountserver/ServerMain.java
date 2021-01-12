@@ -37,9 +37,7 @@ public class ServerMain {
             while(true){
                 Socket connSocket = serverSocket.accept();
                 System.out.println("New user connected");
-            
-
-                
+                  
             TransactionThread newAccountThread = new TransactionThread(connSocket, this);
             //transactions.add(newAccountThread);
             newAccountThread.start();

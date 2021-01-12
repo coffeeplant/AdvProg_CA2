@@ -27,8 +27,9 @@ public class ClientMain {
     
         private String hostname;
         private int port;
-        private String userName;
-        
+        private Integer accountNumber;
+        private String transactionType;
+        private Double amount;
         // Read user input
 
     
@@ -36,6 +37,15 @@ public class ClientMain {
             this.hostname = hostname;
             this.port = port;
         }
+
+    public ClientMain(String hostname, int port, int accountNumber, String transactionType, double amount) {
+        this.hostname = hostname;
+        this.port = port;
+        this.accountNumber = accountNumber;
+        this.transactionType = transactionType;
+        this.amount = amount;
+    }
+        
         
         public void execute(){
             try{       
@@ -43,7 +53,7 @@ public class ClientMain {
                 Socket connSocket = new Socket(hostname, port);
                 System.out.println("Connected to the bank");
                 
-                new TransactionThread(connSocket, this).start();
+                new TransactionThread(connSocket, this,accountNumber, transactionType, amount ).start();
                 //new ToBank(connSocket, this).start();
                 
             }catch (UnknownHostException e){
@@ -54,14 +64,14 @@ public class ClientMain {
             }
         }//end of exceute method
         
-        void setUserName(String userName){
-            this.userName = userName;
-        }
-        
-        String getUserName(){
-            return this.userName;
-        }
-        
+//        void setUserName(String userName){
+//            this.userName = userName;
+//        }
+//        
+//        String getUserName(){
+//            return this.userName;
+//        }
+//        
     public static void main(String[] args) {
         
         String hostname = "localhost";
@@ -84,7 +94,7 @@ public class ClientMain {
 //        System.out.println("Value is not a Double");
         
     //creating connection to server
-        ClientMain client = new ClientMain(hostname, port);
+        ClientMain client = new ClientMain(hostname, port, accountNumber, transactionType, amount );
         client.execute();
 
     }//end of main
