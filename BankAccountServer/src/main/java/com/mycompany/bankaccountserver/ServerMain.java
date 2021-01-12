@@ -16,14 +16,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class ServerMain {
      
         private int port;
-        private Map<Integer, BankAccount> accounts = new HashMap<>();
-        //private Set<String> accountNo = new HashSet<>();
+        //private Map<Integer, BankAccount> accounts = new ConcurrentHashMap<>();
+        private Set<String> accountNo = new HashSet<>();
         //private List<TransactionThread> transactions = new ArrayList();
+        //private List<BankAccount> accounts = new ArrayList();
         
         public ServerMain(){
             
@@ -82,25 +84,39 @@ public class ServerMain {
 //        }
 //    }//end of broadcast
     
-    void addAccount(int acNum, BankAccount account){
-        accounts.put(acNum, account);
+    void addAccount(BankAccount account){
+        accounts.add(account);
         System.out.println("hashmap" +Arrays.asList(accounts));
     }    
     
-    boolean getAccount(int acNum){
-        System.out.println("Inside getAccount method");
-        if(accounts.containsKey(acNum)){
-            return true;
-        }else{
-            return false;
-        }
-    }
+//    boolean getAccount(Integer acNum){
+//        System.out.println("Inside getAccount method");
+//        accounts.contains(acNum);
+//        System.out.println(accounts.get(0)== acNum);
+//        return accounts.containsKey(acNum);
+//        
+//    }
     
+    public static boolean getAccount(List<BankAccount> accounts, Integer acNum){
+        System.out.println("Inside get Account");
+        for(BankAccount account : accounts){
+            if (account.getAccountNumber() == acNum) {
+                System.out.println("it's true");
+                return true;
+            }
+        }
+        System.out.println("its false");
+        return false;
+    }
     
     
     boolean hasUsers(){
         return !this.accounts.isEmpty();
-    }    
+    }
+    
+    public List<BankAccount> getAccountsList(){
+        return accounts;
+    }
     
 //    void removeUser(String userName, BankAccountThread aUser){
 //        boolean present = userNames.remove(userName);

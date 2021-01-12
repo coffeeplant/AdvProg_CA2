@@ -17,7 +17,7 @@ import java.util.Set;
  */
 public class BankAccount implements Serializable, Account{
     
-    //private List<BankAccount> accounts = new ArrayList();
+
     //private Set<BankAccount> accounts = new HashSet<>();
 
     
@@ -28,9 +28,13 @@ public class BankAccount implements Serializable, Account{
     private double amount;
     final private List<Observer> observers = new ArrayList();
     
+
+    
     private String freeTransactionLimit;
     
     ServerMain sm;
+    
+    private List<BankAccount> accounts = sm.getAccountsList();
 
     public BankAccount() {
         this.sm = new ServerMain();
@@ -95,14 +99,14 @@ public class BankAccount implements Serializable, Account{
         System.out.println("is deposit method running");
         System.out.println("Amount: " +amount);
        
-            if(!sm.getAccount(accountNumber)){
+            if(!sm.getAccount(accounts, accountNumber)){
             //createAccount();
             System.out.println("Creating new account with a/c number: " +accountNumber);
             BankAccount newAccount = new BankAccount(accountNumber);
                 System.out.println("newaccount: "+newAccount);
             newAccount.setNumOfDeposits(1);
             newAccount.setCurrentBalance(amount);
-            sm.addAccount(accountNumber, newAccount);
+            sm.addAccount(newAccount);
             
             numOfDeposits = newAccount.getNumOfDeposits();
             currentBalance = newAccount.getCurrentBalance();
@@ -114,7 +118,7 @@ public class BankAccount implements Serializable, Account{
             this.currentBalance += amount;
             System.out.println("Available Balance " +this.currentBalance);
             numOfDeposits++;
-            sm.addAccount(accountNumber, this);
+            sm.addAccount(this);
             System.out.println("Transaction complete");
             notify();
         }
@@ -153,9 +157,9 @@ public class BankAccount implements Serializable, Account{
     }
     
     public synchronized double withdraw(int accountNumber, double amount){
-        if(sm.getAccount(accountNumber)== false){
+        if(sm.getAccount(accounts, accountNumber)== false){
             System.out.println("No such account exists");
-        }else if (sm.getAccount(accountNumber) && amount>currentBalance){
+        }else if (sm.getAccount(accounts, accountNumber) && amount>currentBalance){
             System.out.println("Insufficient funds");
             try{
                 wait();
