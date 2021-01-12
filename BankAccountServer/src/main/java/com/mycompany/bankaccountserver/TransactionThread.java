@@ -10,9 +10,14 @@ package com.mycompany.bankaccountserver;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -24,7 +29,7 @@ import java.net.Socket;
  */
 public class TransactionThread extends Thread{
     
-    
+
     private Socket connSocket;
     private ServerMain serverMain;
     private PrintWriter serverOutput;
@@ -37,87 +42,97 @@ public class TransactionThread extends Thread{
     private Double amount;
     String[] sp;
     
-
+    BankAccount bankAccount;
     
-    //User u = new User();
+    public TransactionThread(){
+        this.bankAccount = new BankAccount();
+    }
     
     public TransactionThread(Socket cs, ServerMain sm){
         this.connSocket = cs;
         this.serverMain = sm;
+        this.bankAccount = new BankAccount();
+         
+    }
+    
+    public BankAccount fileAccountCheck(int accountNumber, double amount){
+
+        File file = new File("bankaccount.csv");
+            if (file.exists()){
+                try{
+                    FileInputStream fileIn = new FileInputStream(file);
+                    ObjectInputStream accountIn = new ObjectInputStream(fileIn);
+                    bankAccount = (BankAccount) accountIn.readObject();
+                    return bankAccount;
+                }catch(FileNotFoundException e){
+                   System.out.println("File not found");
+                }catch(IOException e){
+                   System.out.println(e.getMessage());
+                }catch(Exception e){
+                   System.out.println("Exception");
+                }
+           }else{
+                bankAccount = new BankAccount(accountNumber, amount);
+           }
+        return bankAccount;
     }
 
     public void run(){
+
         try{
-            
-        //will need objectinout stream to take in file
-        // if File (false) create new BankAccount object
-            System.out.println("inside transaction thread run");
-//        InputStream input = this.connSocket.getInputStream();
-//        BufferedReader serverInput = new BufferedReader(new InputStreamReader(input));
-        
 
-        clientInput = new BufferedReader(new InputStreamReader(this.connSocket.getInputStream()));
+    //        InputStream input = this.connSocket.getInputStream();
+    //        BufferedReader serverInput = new BufferedReader(new InputStreamReader(input));
+            clientInput = new BufferedReader(new InputStreamReader(this.connSocket.getInputStream()));
 
-        OutputStream output = connSocket.getOutputStream();
-        serverOutput = new PrintWriter(output, true);
-            System.out.println("after streams made");
-            
-        //this works for now but may be way to pass over and user object instead
-        
-        String clientRequest = clientInput.readLine();
-            System.out.println("TEsting clientRequest: " +clientRequest);
-        sp = clientRequest.split(",");
-            System.out.println("sp[0]:" +sp[0]);
-        accountNumber = Integer.parseInt(sp[0]);
-            System.out.println("accountNumer: " +accountNumber);
-        transactionType = (sp[1]);
-            System.out.println("transactionType: " +transactionType);
-        amount = Double.parseDouble(sp[0]);
-            System.out.println("amount: " +amount);
-        
-//        String serverMessage = "New transaction request received";
-//        serverOutput.println(serverMessage);
- 
-        //serverMain.addUserName(userName);
-        
-        //printUsers();
-        
-      
-        BankAccount ba = new BankAccount(accountNumber, amount );
-        
-        
-        System.out.println("accountNumber: " + ba.getAccountNumber());
-        System.out.println("Number of Deposits: " +ba.getNumOfDeposits());
-        System.out.println("Number of Withdrawals: " +ba.getNumOfWithdrawals());
-        System.out.println("Current Blance: " +ba.getCurrentBalance()+ "\n");
-        
-            if(transactionType.equalsIgnoreCase("DEPOSIT")){
-                ba.deposit();
-            }else{
-                ba.withdraw(amount);
+            OutputStream output = connSocket.getOutputStream();
+            serverOutput = new PrintWriter(output, true);
+              //  System.out.println("after streams made");
+
+            //this works for now but may be way to pass over and user object instead
+//CLIENT INPUT
+            String clientRequest = clientInput.readLine();
+      //          System.out.println("TEsting clientRequest: " +clientRequest);
+            sp = clientRequest.split(",");
+     //           System.out.println("sp[0]:" +sp[0]);
+            accountNumber = Integer.parseInt(sp[0]);
+                System.out.println("accountNumber: " +accountNumber);
+            transactionType = (sp[1]);
+                System.out.println("transactionType: " +transactionType);
+            amount = Double.parseDouble(sp[2]);
+                System.out.println("amount: " +amount);
+                
+                
+            TransactionThread t = new TransactionThread();
+            BankAccount ba = t.fileAccountCheck(accountNumber, amount);
+//PASSING TO DEPOSIT/WITHDRAW
+                if(transactionType.equalsIgnoreCase("DEPOSIT")){
+                    ba.deposit(accountNumber, amount);
+                }else if (transactionType.equalsIgnoreCase("WITHDRAW")){
+                    ba.withdraw(accountNumber, amount);
+                }
+//SENDING RESPONSE TO CUSTOMER
+            serverOutput.println("accountNumber: " + ba.getAccountNumber());
+                System.out.println("Sent TEST: accountNumber:" + ba.getAccountNumber());
+            serverOutput.println("Number of Deposits: " +ba.getNumOfDeposits());
+                System.out.println("Number of Deposits: " +ba.getNumOfDeposits());
+            serverOutput.println("Number of Withdrawals: " +ba.getNumOfWithdrawals());
+                System.out.println("Number of Withdrawals: " +ba.getNumOfWithdrawals());
+            serverOutput.println("Current Blance: " +ba.getCurrentBalance()+ "\n");
+                System.out.println("Current Blance: " +ba.getCurrentBalance()+ "\n");
+
+            //serverMain.removeUser(userName, this);
+            connSocket.close();
+
+            //serverMessage = userName + "has quitted.";
+            //serverOutput.println(serverMessage);
+
+            }catch (IOException e){
+                System.out.println("IO Exception");
             }
-            
-
-              
-        serverOutput.println("accountNumber: " + ba.getAccountNumber());
-            System.out.println("Sent TEST: accountNumber:" + ba.getAccountNumber());
-        serverOutput.println("Number of Deposits: " +ba.getNumOfDeposits());
-        serverOutput.println("Number of Withdrawals: " +ba.getNumOfWithdrawals());
-        serverOutput.println("Current Blance: " +ba.getCurrentBalance()+ "\n");
-
-        
-
-        
-        //serverMain.removeUser(userName, this);
-        connSocket.close();
-        
-        //serverMessage = userName + "has quitted.";
-        //serverOutput.println(serverMessage);
-
-        }catch (IOException e){
-                        System.out.println("IO Exception");
-                    }
     }//end of run  
+    
+
     
 //    void printUsers(){
 //        if(serverMain.hasUsers()){
@@ -128,9 +143,9 @@ public class TransactionThread extends Thread{
 //        }
 //    }//end of print users
     
-    void sendMessage(String message){
-        serverOutput.println(message);
-    }
+//    void sendMessage(String message){
+//        serverOutput.println(message);
+//    }
     
 
         

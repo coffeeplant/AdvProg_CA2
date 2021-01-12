@@ -5,6 +5,7 @@
  */
 package com.mycompany.bankaccountserver;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.Set;
  *
  * @author Bebhin
  */
-public class BankAccount {
+public class BankAccount implements Serializable{
     
     //private List<BankAccount> accounts = new ArrayList();
     //private Set<BankAccount> accounts = new HashSet<>();
@@ -42,6 +43,8 @@ public class BankAccount {
     public BankAccount(int accountNumber) {
         this.sm = new ServerMain();
         this.accountNumber = accountNumber;
+        this.numOfDeposits = numOfDeposits;
+        this.numOfWithdrawals = numOfWithdrawals;
         //accounts.add(this);
      }
 
@@ -77,37 +80,39 @@ public class BankAccount {
         this.currentBalance = currentBalance;
     }
     
-    public void createAccount(){
-        BankAccount newAccount = new BankAccount(accountNumber);
-        newAccount.setNumOfDeposits(1);
-        newAccount.setCurrentBalance(amount);
-        sm.addAccount(accountNumber, newAccount);
-        //should this happen here or in thread?
-    }
+//    public void createAccount(){
+//        System.out.println("Inside create account");
+//        BankAccount newAccount = new BankAccount(accountNumber);
+//
+//        //should this happen here or in thread?
+//    }
 
     //THIS NEEDS TIDYING UP, DOUBLING UP ON CODE AT THE MOMENT
-    public double deposit(){
+    public synchronized double deposit(int accountNumber, double amount){
         System.out.println("is deposit method running");
         System.out.println("Amount: " +amount);
-        try{
-            if(sm.getAccount(accountNumber)== false){
-            createAccount();
+       
+            if(!sm.getAccount(accountNumber)){
+            //createAccount();
             System.out.println("Creating new account with a/c number: " +accountNumber);
-            sm.addAccount(accountNumber, this);
-            System.out.println("Going to deposit" +amount);
-            this.currentBalance = currentBalance +amount;
-            System.out.println("Available Balance " +this.currentBalance);
-            numOfDeposits++;
+            BankAccount newAccount = new BankAccount(accountNumber);
+                System.out.println("newaccount: "+newAccount);
+            newAccount.setNumOfDeposits(1);
+            newAccount.setCurrentBalance(amount);
+            sm.addAccount(accountNumber, newAccount);
+            
+            numOfDeposits = newAccount.getNumOfDeposits();
+            currentBalance = newAccount.getCurrentBalance();
         }else{
-            sm.addAccount(accountNumber, this);
+
             System.out.println("Going to deposit" +amount);
             this.currentBalance += amount;
             System.out.println("Available Balance " +this.currentBalance);
             numOfDeposits++;
+            sm.addAccount(accountNumber, this);
         }
-        }catch(NullPointerException e){
-            System.out.println("null pointer in deposit method");
-        }
+        
+        
 //                })
 //        if(!sm.accounts(accountNumber)){
 //            createAccount(accountNumber, amount);
@@ -140,11 +145,19 @@ public class BankAccount {
         return currentBalance;
     }
     
-    public double withdraw(double amount){
-        //check accoutn exists: if not generate error
-        //check balance sufficent, if not no change to balance, generate error
-        //decreses balance by amount
-        numOfWithdrawals++;
+    public synchronized double withdraw(int accountNumber, double amount){
+        if(sm.getAccount(accountNumber)== false){
+            System.out.println("No such account exists");
+        }else if (sm.getAccount(accountNumber) && amount>currentBalance){
+            System.out.println("Insufficient funds");
+        }
+        else{
+            this.currentBalance = currentBalance - amount;
+            this.numOfWithdrawals++;
+        }
+//        //check balance sufficent, if not no change to balance, generate error
+//        //decreses balance by amount
+//        
 
 
         return currentBalance;

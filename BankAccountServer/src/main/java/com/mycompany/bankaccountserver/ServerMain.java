@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -56,7 +57,6 @@ public class ServerMain {
         
         int port = 9000;
         
-        Map accounts = new HashMap();
         
         ServerMain serverMain = new ServerMain(port);
         serverMain.execute();
@@ -73,18 +73,16 @@ public class ServerMain {
     
     void addAccount(int acNum, BankAccount account){
         accounts.put(acNum, account);
+        System.out.println("hashmap" +Arrays.asList(accounts));
     }    
     
     boolean getAccount(int acNum){
         System.out.println("Inside getAccount method");
-        boolean isthere;
         if(accounts.containsKey(acNum)){
-            isthere =  true;
-            return isthere;
+            return true;
         }else{
-            isthere = false;
+            return false;
         }
-         return isthere;
     }
     
     boolean hasUsers(){
