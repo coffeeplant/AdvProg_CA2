@@ -15,7 +15,7 @@ import java.util.Set;
  *
  * @author Bebhin
  */
-public class BankAccount implements Serializable{
+public class BankAccount implements Serializable, Account{
     
     //private List<BankAccount> accounts = new ArrayList();
     //private Set<BankAccount> accounts = new HashSet<>();
@@ -26,6 +26,9 @@ public class BankAccount implements Serializable{
     private int numOfWithdrawals = 0;
     private double currentBalance;
     private double amount;
+    final private List<Observer> observers = new ArrayList();
+    
+    private String freeTransactionLimit;
     
     ServerMain sm;
 
@@ -103,6 +106,8 @@ public class BankAccount implements Serializable{
             
             numOfDeposits = newAccount.getNumOfDeposits();
             currentBalance = newAccount.getCurrentBalance();
+            System.out.println("Transaction complete");
+            notify();
         }else{
 
             System.out.println("Going to deposit" +amount);
@@ -110,6 +115,8 @@ public class BankAccount implements Serializable{
             System.out.println("Available Balance " +this.currentBalance);
             numOfDeposits++;
             sm.addAccount(accountNumber, this);
+            System.out.println("Transaction complete");
+            notify();
         }
         
         
@@ -140,7 +147,7 @@ public class BankAccount implements Serializable{
  
         //check account exists. if accountNumber does not exist new account made 
 
- 
+        checkTransactionLimit();
 
         return currentBalance;
     }
@@ -150,6 +157,13 @@ public class BankAccount implements Serializable{
             System.out.println("No such account exists");
         }else if (sm.getAccount(accountNumber) && amount>currentBalance){
             System.out.println("Insufficient funds");
+            try{
+                wait();
+            }catch(Exception e){
+                System.out.println("Interruption occured");
+            }
+            this.currentBalance = currentBalance - amount;
+            this.numOfWithdrawals++;
         }
         else{
             this.currentBalance = currentBalance - amount;
@@ -158,9 +172,44 @@ public class BankAccount implements Serializable{
 //        //check balance sufficent, if not no change to balance, generate error
 //        //decreses balance by amount
 //        
-
+        checkTransactionLimit();
 
         return currentBalance;
     }
+    
+    //**************METHODS RLEATED TO OBSERVER DESIGN PATTERN****************
+    public void checkTransactionLimit(){
+        if(numOfDeposits + numOfWithdrawals >1){
+            setFreeTransactionLimit();
+        }
+    }
+
+    @Override
+    public void addObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        observers.remove(observers.indexOf(observer));
+
+    }
+
+    @Override
+    public void notifyObserver() {
+        observers.forEach((observer) -> {
+            observer.update(freeTransactionLimit);
+        });
+    }
+    
+    public String getFreeTransactionLimit(){
+        return freeTransactionLimit;
+    }
+    
+    public void setFreeTransactionLimit(){
+        this.freeTransactionLimit = "Transaction limit reached, all transactions will now be charged";
+        notifyObserver();
+    }
+    
     
 }

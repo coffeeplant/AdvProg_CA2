@@ -56,10 +56,21 @@ public class ServerMain {
 
         
         int port = 9000;
-        
-        
+
+
+//**SAMPLE USE OF TRANSACTION MOTNIOR UPSING OBSERVER DESIGN PATTERN, METHOD IN USE IN 
+// WITHDRAW AND DEPOSIT METHODS WITHIN BANKACCOUNT       
+        BankAccount bankAccount = new BankAccount();
+        TransactionMonitor tMonitor = new TransactionMonitor(bankAccount);
+
+        System.out.println("Updating transaction monitor");
+        bankAccount.setFreeTransactionLimit();
+
+//** Runnig method to open ServerSocket
         ServerMain serverMain = new ServerMain(port);
         serverMain.execute();
+        
+
         
     }//end of main
     
@@ -84,6 +95,8 @@ public class ServerMain {
             return false;
         }
     }
+    
+    
     
     boolean hasUsers(){
         return !this.accounts.isEmpty();
