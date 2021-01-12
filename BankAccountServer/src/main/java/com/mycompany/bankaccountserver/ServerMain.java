@@ -5,25 +5,28 @@
  */
 package com.mycompany.bankaccountserver;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
 
 public class ServerMain {
      
         private int port;
+        private Map<Integer, BankAccount> accounts = new HashMap<>();
         //private Set<String> accountNo = new HashSet<>();
         //private List<TransactionThread> transactions = new ArrayList();
+        
+        public ServerMain(){
+            
+        }
         
         public ServerMain(int port){
             this.port = port;
@@ -49,8 +52,11 @@ public class ServerMain {
     }//end of execute
     
     public static void main(String[] args) {
+
         
         int port = 9000;
+        
+        Map accounts = new HashMap();
         
         ServerMain serverMain = new ServerMain(port);
         serverMain.execute();
@@ -65,9 +71,25 @@ public class ServerMain {
 //        }
 //    }//end of broadcast
     
-//    void addUserName(String userName){
-//        userNames.add(userName);
-//    }    
+    void addAccount(int acNum, BankAccount account){
+        accounts.put(acNum, account);
+    }    
+    
+    boolean getAccount(int acNum){
+        System.out.println("Inside getAccount method");
+        boolean isthere;
+        if(accounts.containsKey(acNum)){
+            isthere =  true;
+            return isthere;
+        }else{
+            isthere = false;
+        }
+         return isthere;
+    }
+    
+    boolean hasUsers(){
+        return !this.accounts.isEmpty();
+    }    
     
 //    void removeUser(String userName, BankAccountThread aUser){
 //        boolean present = userNames.remove(userName);

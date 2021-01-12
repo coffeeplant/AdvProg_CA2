@@ -85,16 +85,19 @@ public class TransactionThread extends Thread{
       
         BankAccount ba = new BankAccount(accountNumber, amount );
         
+        
         System.out.println("accountNumber: " + ba.getAccountNumber());
         System.out.println("Number of Deposits: " +ba.getNumOfDeposits());
         System.out.println("Number of Withdrawals: " +ba.getNumOfWithdrawals());
         System.out.println("Current Blance: " +ba.getCurrentBalance()+ "\n");
         
             if(transactionType.equalsIgnoreCase("DEPOSIT")){
-                ba.deposit(amount);
+                ba.deposit();
             }else{
                 ba.withdraw(amount);
             }
+            
+
               
         serverOutput.println("accountNumber: " + ba.getAccountNumber());
             System.out.println("Sent TEST: accountNumber:" + ba.getAccountNumber());
@@ -128,6 +131,9 @@ public class TransactionThread extends Thread{
     void sendMessage(String message){
         serverOutput.println(message);
     }
+    
+
+        
     
 
 }
