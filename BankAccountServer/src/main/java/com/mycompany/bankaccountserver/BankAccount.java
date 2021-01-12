@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.mycompany.bankaccountserver;
 
 import java.io.Serializable;
@@ -11,23 +6,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- *
- * @author Bebhin
- */
 public class BankAccount implements Serializable, Account{
-    
-    //private List<BankAccount> accounts = new ArrayList();
-    //private Set<BankAccount> accounts = new HashSet<>();
-
-    
+        
     private int accountNumber;
     private int numOfDeposits = 0;
     private int numOfWithdrawals = 0;
     private double currentBalance;
     private double amount;
-    final private List<Observer> observers = new ArrayList();
     
+    final private List<Observer> observers = new ArrayList();
     private String freeTransactionLimit;
     
     ServerMain sm;
@@ -40,7 +27,6 @@ public class BankAccount implements Serializable, Account{
         this.sm = new ServerMain();
         this.accountNumber = accountNumber;
         this.amount = amount;
-
     }
     
     public BankAccount(int accountNumber) {
@@ -48,7 +34,6 @@ public class BankAccount implements Serializable, Account{
         this.accountNumber = accountNumber;
         this.numOfDeposits = numOfDeposits;
         this.numOfWithdrawals = numOfWithdrawals;
-        //accounts.add(this);
      }
 
     public int getAccountNumber() {
@@ -82,76 +67,34 @@ public class BankAccount implements Serializable, Account{
     public void setCurrentBalance(double currentBalance) {
         this.currentBalance = currentBalance;
     }
-    
-//    public void createAccount(){
-//        System.out.println("Inside create account");
-//        BankAccount newAccount = new BankAccount(accountNumber);
-//
-//        //should this happen here or in thread?
-//    }
-
-    //THIS NEEDS TIDYING UP, DOUBLING UP ON CODE AT THE MOMENT
+//deposit method synchronized
     public synchronized double deposit(int accountNumber, double amount){
-        System.out.println("is deposit method running");
-        System.out.println("Amount: " +amount);
-       
-            if(!sm.getAccount(accountNumber)){
-            //createAccount();
-            System.out.println("Creating new account with a/c number: " +accountNumber);
-            BankAccount newAccount = new BankAccount(accountNumber);
-                System.out.println("newaccount: "+newAccount);
-            newAccount.setNumOfDeposits(1);
-            newAccount.setCurrentBalance(amount);
-            sm.addAccount(accountNumber, newAccount);
-            
-            numOfDeposits = newAccount.getNumOfDeposits();
-            currentBalance = newAccount.getCurrentBalance();
-            System.out.println("Transaction complete");
-            notify();
-        }else{
+//checks to see if accounts exists in hashmap       
+    if(!sm.getAccount(accountNumber)){
+        //creating new account and setting variables
+        System.out.println("Creating new account with a/c number: " +accountNumber +"\n");
+        BankAccount newAccount = new BankAccount(accountNumber);
+        newAccount.setNumOfDeposits(1);
+        newAccount.setCurrentBalance(amount);
+        //adding a/c to hashmap
+        sm.addAccount(accountNumber, newAccount);
 
-            System.out.println("Going to deposit" +amount);
-            this.currentBalance += amount;
-            System.out.println("Available Balance " +this.currentBalance);
-            numOfDeposits++;
-            sm.addAccount(accountNumber, this);
-            System.out.println("Transaction complete");
-            notify();
-        }
-        
-        
-//                })
-//        if(!sm.accounts(accountNumber)){
-//            createAccount(accountNumber, amount);
-//        }
-//        for (int i = 0; i < accounts.size(); i++) {
-//            System.out.println(accounts.get(i));
-//        }
-//        for(BankAccount accountNumber : accounts){
-//            System.out.println("testing iterator" +accountNumber);
-//        }
-//        
-//        return currentBalance;
-//    }
-//        for (BankAccount b : accounts.getAccountNumber()) {
-//            if (c.getId() == customerID) {
-//                foundCustomer = c;
-//            }
-//        
-//        if(true){
-//        accounts.keySet().contains(accountNumber);
-//        }
-//        if(!accounts.contains(accounts.getAccountNumber(accountNumber))){
-//            createAccount(accountNumber, amount);
-//        }
- 
-        //check account exists. if accountNumber does not exist new account made 
-
+        numOfDeposits = 1;
+        currentBalance = amount;
+        System.out.println("Transaction complete");
+    }else{
+        this.currentBalance += amount;
+        numOfDeposits++;
+        sm.addAccount(accountNumber, this);
+        notify();
+    }
+    //calling method linked to observer each time num of deposits is updated   
         checkTransactionLimit();
 
         return currentBalance;
     }
-    
+
+//withdraw method synchronized    
     public synchronized String withdraw(int accountNumber, double amount){
         if(sm.getAccount(accountNumber)== false){
             return "No such account exists";
@@ -163,17 +106,14 @@ public class BankAccount implements Serializable, Account{
             this.numOfWithdrawals++;
             checkTransactionLimit();
             
+            //creating string value to return
             String balance = Double.toString(this.currentBalance);
             return balance;
         }
     }
     
-    //**************METHODS RLEATED TO OBSERVER DESIGN PATTERN****************
-    public void checkTransactionLimit(){
-        if(numOfDeposits + numOfWithdrawals >1){
-            setFreeTransactionLimit();
-        }
-    }
+    //**************METHODS RELATED TO OBSERVER DESIGN PATTERN****************
+
 
     @Override
     public void addObserver(Observer observer) {
@@ -193,12 +133,18 @@ public class BankAccount implements Serializable, Account{
         });
     }
     
+    public void checkTransactionLimit(){
+        if(numOfDeposits + numOfWithdrawals >10){
+            setFreeTransactionLimit();
+        }
+    }
+    
     public String getFreeTransactionLimit(){
         return freeTransactionLimit;
     }
     
     public void setFreeTransactionLimit(){
-        this.freeTransactionLimit = "Transaction limit reached, all transactions will now be charged";
+        this.freeTransactionLimit = "Transaction limit reached, all transactions will now be charged\n";
         notifyObserver();
     }
     

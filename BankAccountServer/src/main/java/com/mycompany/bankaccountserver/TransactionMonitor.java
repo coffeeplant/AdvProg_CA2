@@ -1,15 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.mycompany.bankaccountserver;
 
-/**
- *
- * @author Bebhin
- */
 public class TransactionMonitor extends Observer{
+    
+    //a concreate observer class to motnior when an account hodler has reached their limit of free
+    // transactions, update sent when limit of ten reached. 
 
     private String freeTransactionLimit;
     private final int monitorId;
@@ -26,7 +20,6 @@ public class TransactionMonitor extends Observer{
     public void update(String freeTransactionLimit) {
        this.freeTransactionLimit = freeTransactionLimit;
        setMonitor();
-    
     }
     
     private void setMonitor(){

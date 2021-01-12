@@ -11,6 +11,8 @@ package com.mycompany.bankaccountserver;
  */
 public interface Account {
     
+    //interface for BankAccount, required for observer design pattern
+    
     public  void addObserver(Observer observer);
     
     public  void removeObserver(Observer observer);
